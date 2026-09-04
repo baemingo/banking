@@ -75,7 +75,22 @@ Requirement keys you will meet: `applicant_contact`, `credit_check`,
 `bankgiro`, `data_sharing_consent` (answer `yes`), `agreement_setup`,
 `agreement_signature`. The set depends on the package chosen.
 
+`DELETE /applications/{id}` cancels a broken or abandoned application at the
+bank; log in and create the company again for a fresh one.
+
 `scripts/onboard.sh` drives the whole loop in sandbox with plausible answers.
+
+## Members
+
+`GET /members` lists the people the bank has registered for the company
+(its delegates) with their bank access level; it refreshes from the bank
+while a session is alive. `POST /members` with
+`{ "national_id": "<12 digits>", "access_level"?, "accounts"? }` asks the
+bank to add a person. The bank requires a BankID signature, so the response
+is an Authorization to poll, and the bank may refuse when the caller is not
+a legal representative of the company; the refusal comes back as
+`provider_rejected` with the bank's message. Changing or removing members
+at the bank is not available yet.
 
 ## What exists today
 
@@ -88,10 +103,10 @@ Requirement keys you will meet: `applicant_contact`, `credit_check`,
 | `POST /payments`, list, get, `PATCH`, `cancel`, `validate` | live |
 | `POST /payments/submit`, `GET /authorizations/{id}`, `cancel` | live |
 | `POST /logins/{id}/companies`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
-| `POST /sessions`, `GET /events` | live |
+| `POST /sessions`, `GET /events`, `GET /members`, `POST /members` | live |
 | Payment status after `sent` (executed, failed) | next |
 | International payments, saved counterparties | next |
-| Members and invitations, webhooks | after that |
+| Changing or removing members at the bank, webhooks | after that |
 
 Do not invent endpoints that are not listed as live. If a call returns
 `route_not_found`, the feature is not there yet; tell the person so.

@@ -43,6 +43,18 @@ Requirements today:
 | `bank_account` | human step | the bank opens the account holder and a GBP account; currently blocked, see below |
 | `verification` | human step | identity and document checks on the bank's hosted page; appears once the bank account exists |
 
+## Members
+
+`GET /members` lists everyone with access and their role: `read_only`,
+`limited` (transfers between own accounts, queue external payments for a
+full member to send), `full` (everything, including inviting). A `full`
+member invites with `POST /members` `{ "email": "...", "role": "limited" }`;
+the invitation is accepted the moment a person logs in with that email, and
+the company then appears in their list. `PATCH /members/{id}` changes a
+role, `DELETE /members/{id}` removes access, `GET /invitations` and
+`DELETE /invitations/{id}` manage pending invitations. In sandbox, log in
+with the invited email as a persona to accept.
+
 ## What exists today
 
 | Endpoint | Status |
@@ -54,8 +66,9 @@ Requirements today:
 | `GET /events` | live |
 | `POST /payments`, `validate`, list, `PATCH`, `cancel` | live (drafting) |
 | `GET /accounts`, transactions, `POST /payments/submit` | blocked at the bank: the provider credential lacks the account and transfer roles. Accounts are empty and submits are `rejected` with the reason until then |
+| `GET /members`, `POST /members`, `PATCH`, `DELETE`, `GET /invitations` | live |
 | Live login | next |
-| Members and invitations, webhooks | after that |
+| Webhooks | after that |
 
 Do not invent endpoints that are not listed as live. If a call returns
 `route_not_found`, the feature is not there yet; tell the person so.
