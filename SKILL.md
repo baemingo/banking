@@ -1,26 +1,58 @@
 ---
 name: baemingo-banking
-description: Baemingo Banking API. Headless business banking for agents, one country at a time. Use when a user wants to build a bank, open a company bank account, read balances and transactions, or make payments in Sweden, Germany or Italy. This skill only tells you which country skill to install.
+description: Build a bank or banking features on the Baemingo Banking API. Headless business banking for agents in Sweden (BankID, Bankgiro, Plusgiro), Germany and Italy (SEPA). Use when a user wants to build their own bank, a finance dashboard, read company accounts, balances and transactions, or make and approve payments. Sandbox first, no secrets in prompts, one country at a time.
 ---
 
 # Baemingo Banking
 
-A headless, agent-first banking API. One host, `https://banking-api.baemingo.se`,
-one design language, one spec per country. You build for one country at a
-time, so install that country's skill and use nothing else.
+Headless business banking for agents. You get a company's accounts,
+balances, transactions and payments through one HTTP API at
+`https://banking-api.baemingo.se`. A person is needed exactly twice: to log
+in and connect a company, and every time money leaves the company. Both
+arrive as the same `human_step` object. Everything else runs on a 90-day
+API key that you keep in your own configuration.
 
-| Country | Install | Base URL |
+If the environment variable `BANKING_API_BASE` is set, use it as the base
+URL instead of the production host (local and staging deployments).
+
+## The rules
+
+1. **A 90-day key returns everything.** Accounts, balances, transactions,
+   payment drafts. Never log in to read data.
+2. **A human step is needed only to send payments**, and in some countries
+   for a few live bank actions. It always arrives as `human_step`. In
+   sandbox it completes on its own; you just poll.
+3. **Start in the sandbox.** Pass `"sandbox": true` on login. Switch to live
+   only when the person asks.
+4. **Never show an API key to the person.** Store it in your configuration
+   with owner-only permissions.
+5. **Follow `next_actions`.** Every response lists what you can do next with
+   method, href and body. Do not guess routes. Errors carry `remediation`;
+   do what it says. See `references/errors.md`.
+
+## First: which country?
+
+Each country has its own API path, its own login method and its own payment
+types. Ask the person which country their company is registered in if you do
+not already know, then read that country's folder and follow only that.
+
+| Country | Read | Status |
 |---|---|---|
-| Sweden | `npx skills add baemingo/banking-sweden` | `https://banking-api.baemingo.se/se/v1` |
-| Germany | `npx skills add baemingo/banking-germany` (not yet published) | `https://banking-api.baemingo.se/de/v1` |
-| Italy | `npx skills add baemingo/banking-italy` (not yet published) | `https://banking-api.baemingo.se/it/v1` |
+| Sweden | `countries/sweden/README.md` | live |
+| Germany | `countries/germany/README.md` | not yet available |
+| Italy | `countries/italy/README.md` | not yet available |
 
-Every country follows the same two rules:
+Do not mix countries. A Swedish key does not work on the German path and
+vice versa.
 
-1. A 90-day API key returns everything: accounts, balances, transactions,
-   payment drafts, events. You never log in to read.
-2. A human step is required only to send payments, and in Sweden for a few
-   live bank actions. It always arrives as the same `human_step` object, and
-   in sandbox it completes on its own.
+## Shared conventions
 
-Ask the user which country they are building for, then install that skill.
+- Money is `{ "amount": "123.45", "currency": "SEK" }`. Decimal strings.
+- Ids are prefixed: `cmp_` company, `lgn_` login, `acct_` account, `txn_`
+  transaction, `pay_` payment, `auth_` authorization.
+- Lists paginate with `limit` and `cursor`; follow `next_cursor` until null.
+- Send `Idempotency-Key: <unique string>` on every POST you might retry.
+- Pending resources carry `poll.href` and `poll.after_ms`.
+- Machine-readable specs: `GET {base}/{cc}/v1/openapi.json` and
+  `GET {base}/{cc}/v1/llms.txt`. `GET {base}/llms.txt` is this document in
+  short form.
