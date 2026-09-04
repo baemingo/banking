@@ -13,8 +13,13 @@ There is no approve endpoint and nothing to click. Just poll.
 |---|---|---|---|
 | `199511062391` | Victorio Gustafsson | Sunny Days AB | Active company, two accounts, cards, inbox. Best default. |
 | `199511072382` | Marie Hassan | Last Straw AB | Active company, two accounts, one card |
-| `199511082399` | Johan Johansson | On Time AB | Onboarding under review at the bank |
-| `199511092380` | Johan Johansson | Last Call AB | Onboarding not started; use to try creating a company |
+| `199511082399` | Malin Öberg | none yet | Use to try onboarding: create a company with organisation number `5578923434` (On Time AB) |
+| `199511092380` | Johan Johansson | none yet | Use to try onboarding: create a company with organisation number `5578933433` (Last Call AB) |
+
+Onboarding in sandbox runs against the bank's real test flow. Applications
+are shared: if someone has already started one for the organisation, the API
+adopts it and you continue where they left off. The sandbox never runs the
+final "open the account" step, so an approved sandbox company has no accounts.
 
 Sandbox data is shared between everyone using these identities. Do not rely
 on balances or transaction counts staying the same.

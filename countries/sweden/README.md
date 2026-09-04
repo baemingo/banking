@@ -49,6 +49,34 @@ movement we know of was booked, not when the number was computed.
 
 `scripts/pay.sh` runs the whole thing in sandbox.
 
+## Opening a new company's account (onboarding)
+
+1. Log in as a person with no company. The complete login has a
+   `create_company` action; `POST` it with
+   `{ "registration_number": "5578933433" }` (10 digits, or 12 with the 16
+   prefix). The company appears with status `onboarding` and an
+   `application`.
+2. Connect it for a key. `GET /company` gives `application`;
+   `GET /applications/{id}` returns `requirements[]`.
+3. Loop: take the first `pending` requirement of kind `form`, ask the person
+   for what its `schema` needs, `POST` to `submit.href`, fetch again. Every
+   form has a `prefill` with what the bank already knows and, for
+   questionnaires, the questions and choices. Answer questionnaires with
+   `question_id` and `answer_choice_id` pairs.
+4. Requirements of kind `human_step` are BankID signatures; show
+   `human_step` to the person. In sandbox they complete on their own.
+5. The bank needs a live session for onboarding calls. If a call returns
+   `human_step_required`, follow its `open_session` action, poll the
+   Authorization, then retry. In sandbox that completes on its own too.
+
+Requirement keys you will meet: `applicant_contact`, `credit_check`,
+`beneficial_owners`, `kyc_questions`, `aml_questions`, `package`,
+`debit_card` (pick `display_name` from `prefill.allowed_display_names`),
+`bankgiro`, `data_sharing_consent` (answer `yes`), `agreement_setup`,
+`agreement_signature`. The set depends on the package chosen.
+
+`scripts/onboard.sh` drives the whole loop in sandbox with plausible answers.
+
 ## What exists today
 
 | Endpoint | Status |
@@ -59,9 +87,11 @@ movement we know of was booked, not when the number was computed.
 | `GET /accounts`, `GET /accounts/{id}`, transactions | live |
 | `POST /payments`, list, get, `PATCH`, `cancel`, `validate` | live |
 | `POST /payments/submit`, `GET /authorizations/{id}`, `cancel` | live |
+| `POST /logins/{id}/companies`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
+| `POST /sessions`, `GET /events` | live |
 | Payment status after `sent` (executed, failed) | next |
 | International payments, saved counterparties | next |
-| Creating a company (onboarding), members, events, webhooks | after that |
+| Members and invitations, webhooks | after that |
 
 Do not invent endpoints that are not listed as live. If a call returns
 `route_not_found`, the feature is not there yet; tell the person so.
