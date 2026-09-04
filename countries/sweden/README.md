@@ -46,6 +46,11 @@ movement we know of was booked, not when the number was computed.
    few seconds. When `status` is `approved`, the payments are `sent`.
 4. `rejected`, `expired` and `cancelled` return the payments to `queued` and
    carry a `reason`.
+5. After `sent`, a payment becomes `scheduled` (dated in the future),
+   `executed` or `failed` (with `failure.reason`). This settles on your next
+   read of accounts or transactions while the bank session from the approval
+   is alive, so read once more a minute after approval. Events
+   `payment.scheduled`, `payment.executed` and `payment.failed` are written.
 
 `scripts/pay.sh` runs the whole thing in sandbox.
 
@@ -118,7 +123,7 @@ at the bank is not available yet.
 | `POST /logins/{id}/companies`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
 | `POST /sessions`, `GET /events`, `GET /members`, `POST /members` | live |
 | `POST /webhooks`, list, `PATCH`, `DELETE`, `test`, `deliveries` | live |
-| Payment status after `sent` (executed, failed) | next |
+| Payment status after `sent`: `scheduled`, `executed`, `failed` | live, settled on the next read while a bank session is alive |
 | International payments, saved counterparties | next |
 | Changing or removing members at the bank | after that |
 
