@@ -12,8 +12,9 @@ in and connect a company, and every time money leaves the company. Both
 arrive as the same `human_step` object. Everything else runs on a 90-day
 API key that you keep in your own configuration.
 
-If the environment variable `BANKING_API_BASE` is set, use it as the base
-URL instead of the production host (local and staging deployments).
+If the environment variable `BANKING_API_BASE` is set, it replaces the host
+`https://banking-api.baemingo.se` (local and staging deployments). Country
+paths such as `/se/v1` are appended to it.
 
 ## The rules
 

@@ -1,7 +1,8 @@
 # Sweden
 
-Base URL: `https://banking-api.baemingo.se/se/v1`, or `$BANKING_API_BASE`
-when set. Identity is BankID. Payments are Bankgiro, Plusgiro, domestic
+Base URL: `https://banking-api.baemingo.se/se/v1`. When `BANKING_API_BASE`
+is set it replaces the host part only, so the base becomes
+`$BANKING_API_BASE/se/v1`. Identity is BankID. Payments are Bankgiro, Plusgiro, domestic
 account transfers and transfers between the company's own accounts.
 
 Read `sandbox.md` in this folder before making any call. Every endpoint with

@@ -4,13 +4,14 @@
 #
 #   scripts/login.sh [national_id]
 #
-# Uses $BANKING_API_BASE if set, otherwise the production base URL.
+# $BANKING_API_BASE replaces the host (https://banking-api.baemingo.se) when set;
+# /se/v1 is always appended.
 # Sandbox by default; set SANDBOX=false for the live bank.
 # Defaults to Victorio Gustafsson (Sunny Days AB).
 set -euo pipefail
 
 NATIONAL_ID="${1:-199511062391}"
-BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se/se/v1}"
+BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se}/se/v1"
 
 login=$(curl -sS -X POST "$BASE/login" -H 'Content-Type: application/json' \
   -d "{\"national_id\":\"$NATIONAL_ID\",\"sandbox\":${SANDBOX:-true}}")

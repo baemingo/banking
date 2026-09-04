@@ -2,7 +2,8 @@
 
 Error codes: `../../references/errors.md`.
 
-Base URL `https://banking-api.baemingo.se/se/v1`, or `$BANKING_API_BASE` if set.
+Base URL `https://banking-api.baemingo.se/se/v1`, or `$BANKING_API_BASE/se/v1` if the
+variable is set.
 All bodies are JSON. All timestamps are ISO 8601 UTC.
 
 ## GET /
@@ -168,7 +169,8 @@ never log in to refresh them.
         "reserved": { "amount": "0.00", "currency": "SEK" },
         "credit_limit": { "amount": "10000.00", "currency": "SEK" },
         "available": { "amount": "27337.00", "currency": "SEK" },
-        "as_of": "2026-06-14T22:01:38.000Z"
+        "as_of": "2026-06-14T22:01:38.000Z",
+        "computed_at": "2026-09-04T16:02:11.000Z"
       },
       "status": "active",
       "next_actions": [
@@ -183,7 +185,9 @@ never log in to refresh them.
 
 `type` is `current`, `savings` or `credit`. `identifiers` may also carry
 `bankgiro` as a list. `available` is `current` minus `reserved` plus
-`credit_limit`.
+`credit_limit`. `as_of` is the booking time of the last movement, so an old
+date means a quiet account; `computed_at` is when the number was produced,
+which is always now.
 
 ## GET /accounts/{id}
 
@@ -218,6 +222,11 @@ inclusive), `kind`.
 Amounts are negative for money out. Follow `next_cursor` until it is null.
 Kinds: `bankgiro_in`, `bankgiro_out`, `plusgiro_out`, `domestic_in`,
 `domestic_out`, `internal`, `swish_in`, `swish_out`, `card`, `fee`, `other`.
+
+## GET /transactions
+
+Every account of the company in one list, newest first. Same query
+parameters and item shape as the per-account list.
 
 ## GET /transactions/{id}
 

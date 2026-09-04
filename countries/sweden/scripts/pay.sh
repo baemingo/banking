@@ -7,10 +7,10 @@
 # Uses $BANKING_API_BASE if set, otherwise the production base URL.
 set -euo pipefail
 
-BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se/se/v1}"
+BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se}/se/v1"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
-KEY=$(BANKING_API_BASE="$BASE" "$HERE/login.sh" 199511062391 2>/dev/null)
+KEY=$("$HERE/login.sh" 199511062391 2>/dev/null)
 AUTH=(-H "Authorization: Bearer $KEY" -H 'Content-Type: application/json')
 
 accounts=$(curl -sS "$BASE/accounts" "${AUTH[@]}")

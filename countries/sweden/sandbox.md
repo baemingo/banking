@@ -20,9 +20,12 @@ Sandbox data is shared between everyone using these identities. Do not rely
 on balances or transaction counts staying the same.
 
 Payments in sandbox go to the bank's test environment and are signed by the
-auto-completing BankID. They reach `sent`. The test bank does not book them
-as transactions, so balances do not move. Use `5050-1055` as a valid Bankgiro
-number and `1234567890128` as a valid OCR reference.
+auto-completing BankID. They reach `sent`. The test bank books most of them
+within seconds and the store is refreshed right after approval, so balances
+and transactions usually move; do not rely on exact timing. Booked sandbox
+payments show up with kind `domestic_out` regardless of type. Use
+`5050-1055` as a valid Bankgiro number and `1234567890128` as a valid OCR
+reference.
 
 Names may carry a `Demo` prefix from the bank's test environment; the API
 strips it.
