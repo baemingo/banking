@@ -52,7 +52,8 @@ Requirements today:
 | `POST /logins/{id}/companies` | live |
 | `GET /company`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
 | `GET /events` | live |
-| `GET /accounts`, transactions, payments | blocked at the bank: the provider credential lacks the account roles. `GET /accounts` returns an empty list until then |
+| `POST /payments`, `validate`, list, `PATCH`, `cancel` | live (drafting) |
+| `GET /accounts`, transactions, `POST /payments/submit` | blocked at the bank: the provider credential lacks the account and transfer roles. Accounts are empty and submits are `rejected` with the reason until then |
 | Live login | next |
 | Members and invitations, webhooks | after that |
 

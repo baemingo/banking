@@ -88,7 +88,22 @@ Roles: `director`, `signatory`, `owner` (25% or more). Returns the refreshed
 application. Submitting a `human_step` requirement or a blocked one returns
 `invalid_state`.
 
+## Accounts, transactions, payments
+
+Same shapes and routes as Sweden (`../sweden/api.md`): `GET /accounts`,
+`GET /accounts/{id}/transactions`, `GET /transactions`, `POST /payments`,
+`POST /payments/submit`, `GET /authorizations/{id}`. Differences:
+
+- Payment types are `uk_bank_transfer` with
+  `creditor: { "sort_code": "04-00-04", "account_number": "12345678", "name": "Ada Lovelace", "priority": "fast" }`
+  (`fast` is Faster Payments, `regular` is Bacs) and `internal_transfer`.
+  Currency is GBP. `execute_on` must be omitted; scheduling is not supported.
+- Submit returns an Authorization already `approved` with `human_step: null`,
+  because the key holder is the approver. There is no BankID.
+- Today `GET /accounts` returns an empty list and any submit is `rejected`
+  with a reason naming the missing bank permissions. Drafting and validation
+  work. This changes the moment the provider credential gets its roles.
+
 ## Not yet live
 
-Accounts, transactions and payments wait on bank-side permissions. Live
-login, members, invitations and webhooks are not built.
+Live login, scheduled payments, members, invitations and webhooks.
