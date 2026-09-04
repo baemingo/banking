@@ -80,6 +80,19 @@ bank; log in and create the company again for a fresh one.
 
 `scripts/onboard.sh` drives the whole loop in sandbox with plausible answers.
 
+## Events and webhooks
+
+`GET /events` is the log of everything that happened, oldest first from a
+cursor; poll it when you cannot receive webhooks. `POST /webhooks` with
+`{ "url": "https://...", "types": ["payment.sent"] }` (empty `types` means
+all) subscribes a URL; the response carries `secret` once. Deliveries are
+POSTed as `{ id, type, created_at, company, data }` with a header
+`Baemingo-Signature: t=<unix seconds>, v1=<hex HMAC-SHA256 of "t.body" with the secret>`.
+Any 2xx counts as delivered; failures retry with backoff for about two hours,
+then the webhook is paused and a `webhook.paused` event is written.
+`POST /webhooks/{id}/test` sends a `webhook.test` event;
+`GET /webhooks/{id}/deliveries` shows attempts.
+
 ## Members
 
 `GET /members` lists the people the bank has registered for the company
@@ -104,9 +117,10 @@ at the bank is not available yet.
 | `POST /payments/submit`, `GET /authorizations/{id}`, `cancel` | live |
 | `POST /logins/{id}/companies`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
 | `POST /sessions`, `GET /events`, `GET /members`, `POST /members` | live |
+| `POST /webhooks`, list, `PATCH`, `DELETE`, `test`, `deliveries` | live |
 | Payment status after `sent` (executed, failed) | next |
 | International payments, saved counterparties | next |
-| Changing or removing members at the bank, webhooks | after that |
+| Changing or removing members at the bank | after that |
 
 Do not invent endpoints that are not listed as live. If a call returns
 `route_not_found`, the feature is not there yet; tell the person so.

@@ -43,6 +43,13 @@ Requirements today:
 | `bank_account` | human step | the bank opens the account holder and a GBP account; currently blocked, see below |
 | `verification` | human step | identity and document checks on the bank's hosted page; appears once the bank account exists |
 
+## Events and webhooks
+
+Same as Sweden: `GET /events` to poll, `POST /webhooks` to subscribe an
+https URL to event types, signed deliveries with `Baemingo-Signature`,
+`POST /webhooks/{id}/test` and `GET /webhooks/{id}/deliveries`. See
+`../sweden/README.md` for the signature scheme.
+
 ## Members
 
 `GET /members` lists everyone with access and their role: `read_only`,
@@ -67,8 +74,8 @@ with the invited email as a persona to accept.
 | `POST /payments`, `validate`, list, `PATCH`, `cancel` | live (drafting) |
 | `GET /accounts`, transactions, `POST /payments/submit` | blocked at the bank: the provider credential lacks the account and transfer roles. Accounts are empty and submits are `rejected` with the reason until then |
 | `GET /members`, `POST /members`, `PATCH`, `DELETE`, `GET /invitations` | live |
+| `POST /webhooks` and the rest of the webhook routes | live |
 | Live login | next |
-| Webhooks | after that |
 
 Do not invent endpoints that are not listed as live. If a call returns
 `route_not_found`, the feature is not there yet; tell the person so.
