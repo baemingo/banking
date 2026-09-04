@@ -367,8 +367,15 @@ and `cancelled` carry `reason` and return the payments to `queued`.
 
 Cancel a pending authorization.
 
+## Onboarding, sessions, members, events, webhooks
+
+Live. Shapes are the same as the UK reference (`../uk/api.md`) for
+applications and requirements; `POST /sessions` returns an Authorization
+with a BankID login step; `GET /members` and `POST /members` follow
+`README.md`; `GET /events` and the `/webhooks` routes are documented in
+`README.md`. Fetch `openapi.json` for exact schemas.
+
 ## Not yet live
 
-International payments, saved counterparties, onboarding, members, events and
-webhooks return `route_not_found` today. Their shapes are in the design
-documents at `github.com/baemingo/agentic-banking/docs`.
+International payments and saved counterparties return `route_not_found`
+today. Changing or removing members at the bank is not available.
