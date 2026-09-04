@@ -1,6 +1,6 @@
 ---
 name: baemingo-banking
-description: Build a bank or banking features on the Baemingo Banking API. Headless business banking for agents in Sweden (BankID, Bankgiro, Plusgiro), Germany and Italy (SEPA). Use when a user wants to build their own bank, a finance dashboard, read company accounts, balances and transactions, or make and approve payments. Sandbox first, no secrets in prompts, one country at a time.
+description: Build a bank or banking features on the Baemingo Banking API. Headless business banking for agents in Sweden (BankID, Bankgiro, Plusgiro), the United Kingdom (email login, Faster Payments), Germany and Italy (SEPA). Use when a user wants to build their own bank, a finance dashboard, onboard a company, read company accounts, balances and transactions, or make and approve payments. Sandbox first, no secrets in prompts, one country at a time.
 ---
 
 # Baemingo Banking
@@ -39,7 +39,8 @@ not already know, then read that country's folder and follow only that.
 
 | Country | Read | Status |
 |---|---|---|
-| Sweden | `countries/sweden/README.md` | live |
+| Sweden | `countries/sweden/README.md` | live: login, accounts, transactions, payments |
+| United Kingdom | `countries/uk/README.md` | sandbox: login, company creation, onboarding loop. Accounts and payments wait on bank permissions |
 | Germany | `countries/germany/README.md` | not yet available |
 | Italy | `countries/italy/README.md` | not yet available |
 
