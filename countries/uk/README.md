@@ -40,8 +40,9 @@ Requirements today:
 |---|---|---|
 | `company_details` | form | completed at creation; resubmit to correct |
 | `decision_makers` | form | directors, signatories and owners of 25% or more, each with name, date of birth, address |
-| `bank_account` | human step | the bank opens the account holder and a GBP account; currently blocked, see below |
-| `verification` | human step | identity and document checks on the bank's hosted page; appears once the bank account exists |
+| `bank_account` | form (completed by the API) | the bank opens the account holder and a GBP account |
+| `bank_capabilities` | human step | what the bank allows, capability by capability, with verification state |
+| `verification` | human step | identity and document checks on the bank's hosted page (`human_step.url`) |
 
 ## Events and webhooks
 
@@ -49,6 +50,22 @@ Same as Sweden: `GET /events` to poll, `POST /webhooks` to subscribe an
 https URL to event types, signed deliveries with `Baemingo-Signature`,
 `POST /webhooks/{id}/test` and `GET /webhooks/{id}/deliveries`. See
 `../sweden/README.md` for the signature scheme.
+
+## Cards and financing
+
+`GET /cards` lists cards on the company's accounts; `POST /cards`
+`{ "account": "acct_...", "holder_name": "ADA LOVELACE", "form": "virtual" }`
+issues one (needs the full role and a card product configured at the bank);
+`POST /cards/{id}/freeze` and `/unfreeze` toggle it. `GET /loans/offers`
+lists financing offers, `POST /loans/offers/{id}/accept` takes one, and
+`GET /loans` shows repayment state. Where the bank has not enabled a product
+for this platform, the call returns `provider_rejected` with the bank's own
+message rather than pretending.
+
+The application's `bank_capabilities` requirement lists every capability the
+bank grants the company (settlements, own-account transfers, payouts, cards,
+financing, third-party payments) with `allowed` and its verification state,
+and names anything the bank has not configured for the platform.
 
 ## Members
 
@@ -71,8 +88,10 @@ with the invited email as a persona to accept.
 | `POST /logins/{id}/companies` | live |
 | `GET /company`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
 | `GET /events` | live |
-| `POST /payments`, `validate`, list, `PATCH`, `cancel` | live (drafting) |
-| `GET /accounts`, transactions, `POST /payments/submit` | blocked at the bank: the provider credential lacks the account and transfer roles. Accounts are empty and submits are `rejected` with the reason until then |
+| `GET /accounts`, `GET /accounts/{id}/transactions`, `GET /transactions` | live |
+| `POST /payments`, `validate`, list, `PATCH`, `cancel`, `submit` | live; external transfers are `rejected` until the bank enables `sendToThirdParty` on the platform, and sandbox accounts start at 0.00 GBP |
+| `GET /cards`, `POST /cards`, freeze, unfreeze | live where the bank has a card product configured |
+| `GET /loans/offers`, accept, `GET /loans` | live once the bank enables Capital on the platform; until then `provider_rejected` |
 | `GET /members`, `POST /members`, `PATCH`, `DELETE`, `GET /invitations` | live |
 | `POST /webhooks` and the rest of the webhook routes | live |
 | Live login | next |
