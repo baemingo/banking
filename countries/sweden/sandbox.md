@@ -7,9 +7,11 @@ nothing you do there reaches a real bank.
 
 ## Any personal number works
 
-Log in with any twelve-digit personal number, for example `198001011234`.
-The first login creates a private test bank for that number, and the same
-number always comes back to the same one. Nobody else can see it. It holds:
+Log in with any twelve-digit personal number. Make one up for this project
+(`YYYYMMDDNNNN`, any digits) and do not copy one from documentation: the
+first login creates a private test bank for that number, the same number
+always comes back to the same one, and anyone else using the same number
+shares it. Nobody using a different number can see it. It holds:
 
 - a person with a name derived from the number;
 - one active company with a business account (`Företagskonto`, with a
@@ -18,9 +20,10 @@ number always comes back to the same one. Nobody else can see it. It holds:
   by Bankgiro, supplier payments out, card purchases, Swish, salaries and a
   monthly fee.
 
-Pick a number of your own and stay with it; data persists between runs.
-Numbers nobody has used for 30 days are cleaned up. These three are
-published examples and behave like any other number:
+Stay with your number; data persists between runs. Numbers nobody has used
+for 30 days are cleaned up. These three are published examples and behave
+like any other number, but they are shared by everyone who tries them, so
+use your own for real work:
 
 | Personal number | Person | Company |
 |---|---|---|
@@ -51,8 +54,8 @@ valid OCR reference.
 
 ## Onboarding
 
-Create a company with any ten-digit organisation number, for example
-`5566778899`. The requirements loop is the one the live bank runs: contact
+Create a company with any ten-digit organisation number of your choosing
+(it only has to be unique within your own test bank). The requirements loop is the one the live bank runs: contact
 details, credit check, beneficial owners and their questions, know-your-
 customer and anti-money-laundering questionnaires, industry codes, a package
 choice, then the package's products (Bankgiro, data sharing consent and, for
