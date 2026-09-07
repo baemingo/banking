@@ -23,7 +23,8 @@ keep in your own configuration.
 2. **Anything that needs a person arrives as `human_step`.** Login,
    identity checks and signatures during onboarding, and payment approval
    where the country requires it. Show it to the user and poll; in sandbox
-   it completes on its own.
+   it completes on its own. When it carries `qr`, render that text as a QR
+   code and refresh it from every poll.
 3. **Start in the sandbox.** Pass `"sandbox": true` on login. Nothing in
    sandbox moves real money or reaches a real bank, so test freely. Switch
    to live only when the user asks.

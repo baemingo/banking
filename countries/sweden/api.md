@@ -24,15 +24,23 @@ Discovery. No auth.
 
 Start a BankID login. No auth.
 
-Request:
+Request, live:
 
 ```json
-{ "national_id": "199511062391", "sandbox": true }
+{}
 ```
 
-`sandbox` defaults to `false`. `true` selects the test bank, where any
-twelve-digit personal number works, BankID completes on its own and the key
-will be `sk_test_`.
+Request, sandbox:
+
+```json
+{ "national_id": "198507154321", "sandbox": true }
+```
+
+`sandbox` defaults to `false`. A live login takes no personal number: it is
+a BankID QR code, and whoever scans it is the person logged in. In sandbox
+`national_id` is required; any twelve-digit number works and picks the
+user's private test bank, BankID completes on its own and the key will be
+`sk_test_`.
 
 Response `202`:
 
@@ -59,8 +67,10 @@ Response `202`:
 }
 ```
 
-In live, show `human_step.url` or `human_step.qr` to the user. In sandbox,
-just poll.
+In live, `human_step.qr` is the text to render as a QR code; it rotates every
+second, so render the value from the latest poll and poll every
+`after_ms` (1000 in live). `human_step.url` opens BankID on the same device
+instead. In sandbox, just poll.
 
 ## GET /logins/{id}
 

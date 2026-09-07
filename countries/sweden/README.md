@@ -9,15 +9,17 @@ examples is in `api.md`. Error codes are in `../../references/errors.md`.
 
 ## Logging in
 
-1. `POST /login` with `{ "national_id": "<12 digits>", "sandbox": true }`.
-   In sandbox any twelve-digit personal number works and gets its own
-   private test bank with a company, accounts and history (see
-   `sandbox.md`); BankID completes on its own. Omit `sandbox` or pass
-   `false` for live with a real person. Response is `202` with a
-   `human_step` (type `bankid`) and `human_step.poll.href`.
+1. `POST /login`. Live: send `{}`. Do not ask the user for a personal
+   number; a live login is a BankID QR code and the person is whoever scans
+   it. Sandbox: send `{ "national_id": "<12 digits>", "sandbox": true }`;
+   the number picks the user's private test bank (see `sandbox.md`) and
+   BankID completes on its own. Response is `202` with a `human_step` (type
+   `bankid`) and `human_step.poll.href`.
 2. `GET` the poll href every `poll.after_ms` milliseconds until `status` is
-   `complete`. In live, show `human_step.qr` as an image or `human_step.url`
-   as a link and let the user approve in their BankID app.
+   `complete`. In live, render `human_step.qr` as a QR code and replace it
+   with the value from every new poll, since it rotates every second; the
+   user opens the BankID app, scans it and approves. `human_step.url` opens
+   BankID on the same device instead.
 3. The complete login lists `companies` the user already has access to, each
    with a `connect` action in `next_actions` carrying the exact `method`,
    `href` and `body`. A new user has an empty list and a `create_company`
