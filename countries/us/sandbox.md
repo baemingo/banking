@@ -9,11 +9,12 @@ companies, which is the normal starting point. The documented default is
 has used before, for example `founder+<timestamp>@sandbox.baemingo.se`.
 
 Companies you create are real test companies in the test environment. Use
-any 8-character Companies House number; `12345678` is fine. People you add
-as decision makers are created as test individuals; use made-up names and
-dates of birth.
+any nine-digit EIN; `12-3456789` is fine. People you add as decision makers
+are created as test individuals; use made-up names and dates of birth.
+Addresses need a real two-letter state code.
 
-Creating a company also opens a GBP account and returns the hosted
-verification link. Sandbox accounts start at 0.00 GBP and cannot be funded
+Creating a company also opens a USD account and returns the hosted
+verification link. Sandbox accounts start at 0.00 USD and cannot be funded
 from the API yet, so payments that need a balance fail for lack of funds.
-The response says so plainly.
+The response says so plainly. Use routing number `021000021` for a valid
+test creditor.

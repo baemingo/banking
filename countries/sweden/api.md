@@ -2,8 +2,7 @@
 
 Error codes: `../../references/errors.md`.
 
-Base URL `https://banking-api.baemingo.se/se/v1`, or `$BANKING_API_BASE/se/v1` if the
-variable is set.
+Base URL `https://banking-api.baemingo.com/se/v1`.
 All bodies are JSON. All timestamps are ISO 8601 UTC.
 
 ## GET /
@@ -16,7 +15,7 @@ Discovery. No auth.
   "country": "SE",
   "version": "v1",
   "rules": ["..."],
-  "links": { "openapi": "...", "llms": "...", "guides": "...", "mcp": "...", "skill": "baemingo/banking-sweden" },
+  "links": { "openapi": "...", "llms": "...", "guides": "...", "mcp": "...", "skill": "baemingo/banking" },
   "next_actions": [{ "rel": "login", "method": "POST", "href": ".../login" }]
 }
 ```
@@ -59,7 +58,7 @@ Response `202`:
 }
 ```
 
-In live, show `human_step.url` or `human_step.qr` to the person. In sandbox,
+In live, show `human_step.url` or `human_step.qr` to the user. In sandbox,
 just poll.
 
 ## GET /logins/{id}
@@ -295,8 +294,9 @@ Response `201`:
 ```
 
 Statuses: `draft`, `queued`, `pending_authorization`, `sent`, `scheduled`,
-`executed`, `failed`, `cancelled`. Today payments stop at `sent`; execution
-and failure reporting come with the bank's event feed.
+`executed`, `failed`, `cancelled`. After `sent`, a payment settles to
+`scheduled`, `executed` or `failed` on the next read while a bank session
+is alive.
 
 ## POST /payments/validate
 
@@ -353,8 +353,8 @@ Response `202`, an Authorization:
 }
 ```
 
-`phase` is `login` when the bank first needs a BankID login (no recent
-session), then `signing`. Show `human_step` to the person each time it
+`phase` is `login` when a BankID login is needed first (no recent bank
+session), then `signing`. Show `human_step` to the user each time it
 changes. One batch, one currency, up to 50 payments.
 
 ## GET /authorizations/{id}
@@ -378,4 +378,4 @@ with a BankID login step; `GET /members` and `POST /members` follow
 ## Not yet live
 
 International payments and saved counterparties return `route_not_found`
-today. Changing or removing members at the bank is not available.
+today. Changing or removing members is not available.

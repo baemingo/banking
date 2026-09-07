@@ -1,6 +1,6 @@
-# United Kingdom
+# United States
 
-Base URL: `https://banking-api.baemingo.com/uk/v1`. Identity is an email
+Base URL: `https://banking-api.baemingo.com/us/v1`. Identity is an email
 account. Payments are approved by the API key holder, and a human step
 appears only for identity verification during onboarding. Funds are held by
 Adyen.
@@ -19,10 +19,10 @@ Most users start here: they have no company on the platform yet.
    poll. A new user has an empty `companies` list and a `create_company`
    action in `next_actions`. A returning user sees the companies they have
    access to, each with a `connect` action.
-3. `POST` the create_company action with the company name, Companies House
-   number, legal form and registered address. The company is created with
-   status `onboarding`, a GBP account already open, and now appears in the
-   list.
+3. `POST` the create_company action with the legal business name, EIN, legal
+   form and registered address including the two-letter state. The company
+   is created with status `onboarding`, a USD account already open, and now
+   appears in the list.
 4. `POST` its connect action. Response is `201` with `key` (`sk_test_`) and
    `expires_at`, 90 days out. Store the key; it is shown once.
 5. Send `Authorization: Bearer <key>` on every call from now on.
@@ -37,15 +37,13 @@ a `submit` action. Loop: take the first `pending` requirement of kind `form`,
 ask the user for what its schema needs, `POST` the body to `submit.href`,
 fetch again. Requirements of kind `human_step` carry a link for the user.
 
-Requirements today:
-
 | key | kind | what |
 |---|---|---|
-| `company_details` | form | completed at creation; resubmit to correct. Needs `vat_number` or `vat_absence_reason` |
-| `decision_makers` | form | directors, signatories, owners of 25% or more and controllers, each with name, date of birth, job title, phone, address. At least one `signatory` and one `controller`; one person may hold every role. Never ask for identity numbers or documents: those are collected on the hosted verification page |
+| `company_details` | form | completed at creation; resubmit to correct |
+| `decision_makers` | form | directors, signatories, owners of 25% or more and controllers, each with name, date of birth, job title, phone, address with state. At least one `signatory` and one `controller`; one person may hold every role. Never ask for a social security number or documents: those are collected on the hosted verification page |
 | `business_line` | form | industry code, website and where the money comes from |
 | `terms_of_service` | form | a signatory reads the PDFs linked in `prefill.documents` and accepts with `{ "accepted_by": "<signatory id>", "accepted": true }` |
-| `bank_account` | form (completed by the API) | the GBP account, opened at creation |
+| `bank_account` | form (completed by the API) | the USD account, opened at creation |
 | `bank_capabilities` | human step | what the company can do, capability by capability, with verification state |
 | `verification` | human step | identity and document checks on the hosted verification page (`human_step.url`); `prefill.findings` lists what is still needed |
 
@@ -56,49 +54,23 @@ list in the schema; `339E` is a valid test value. Unknown codes come back as
 ## Accounts
 
 `GET /accounts` lists every account with its current balance. `POST /accounts`
-`{ "name": "Tax reserve" }` opens another GBP account (needs the full role);
+`{ "name": "Tax reserve" }` opens another USD account (needs the full role);
 move money into it with an `internal_transfer` payment.
 
 ## Payments
 
-Types are `uk_bank_transfer` and `internal_transfer`. A bank transfer names
-`creditor: { "sort_code", "account_number", "name", "priority" }` where
-`priority` is `fast` (Faster Payments) or `regular` (Bacs). Submit returns
-an Authorization already `approved` with `human_step: null`; the key holder
-is the approver. Sandbox accounts start at 0.00 GBP; see `sandbox.md`.
+Types are `us_bank_transfer` and `internal_transfer`. A bank transfer names
+`creditor: { "routing_number", "account_number", "account_type", "name", "priority" }`
+where `priority` is `regular` (ACH, default), `wire` (Fedwire) or `instant`
+(RTP). Routing numbers are checked against the ABA checksum before anything
+is sent. Submit returns an Authorization already `approved` with
+`human_step: null`; the key holder is the approver. Sandbox accounts start
+at 0.00 USD; see `sandbox.md`.
 
-## Events and webhooks
+## Events, webhooks, cards, financing, members
 
-Same as Sweden: `GET /events` to poll, `POST /webhooks` to subscribe an
-https URL to event types, signed deliveries with `Baemingo-Signature`,
-`POST /webhooks/{id}/test` and `GET /webhooks/{id}/deliveries`. See
-`../sweden/README.md` for the signature scheme.
-
-## Cards and financing
-
-`GET /cards` lists cards on the company's accounts; `POST /cards`
-`{ "account": "acct_...", "holder_name": "ADA LOVELACE", "form": "virtual" }`
-issues one (needs the full role); `POST /cards/{id}/freeze` and `/unfreeze`
-toggle it. `GET /loans/offers` lists financing offers, `POST
-/loans/offers/{id}/accept` takes one, and `GET /loans` shows repayment state.
-Offers depend on the company's history, so a new sandbox company may see an
-empty list.
-
-The application's `bank_capabilities` requirement lists every capability the
-company has (settlements, own-account transfers, payouts, cards, financing,
-third-party payments) with `allowed` and its verification state.
-
-## Members
-
-`GET /members` lists everyone with access and their role: `read_only`,
-`limited` (transfers between own accounts, queue external payments for a
-full member to send), `full` (everything, including inviting). A `full`
-member invites with `POST /members` `{ "email": "...", "role": "limited" }`;
-the invitation is accepted the moment someone logs in with that email, and
-the company then appears in their list. `PATCH /members/{id}` changes a
-role, `DELETE /members/{id}` removes access, `GET /invitations` and
-`DELETE /invitations/{id}` manage pending invitations. In sandbox, log in
-with the invited email as a persona to accept.
+Identical to the United Kingdom; read `../uk/README.md` sections "Events and
+webhooks", "Cards and financing" and "Members". Only the path differs.
 
 ## What exists today
 
@@ -108,13 +80,13 @@ with the invited email as a persona to accept.
 | `POST /login` (sandbox), `GET /logins/{id}`, `cancel`, `connect` | live |
 | `POST /logins/{id}/companies` | live |
 | `GET /company`, `GET /applications/{id}`, `POST .../requirements/{key}` | live |
-| `GET /events` | live |
-| `GET /accounts`, `POST /accounts`, `GET /accounts/{id}/transactions`, `GET /transactions` | live |
-| `POST /payments`, `validate`, list, `PATCH`, `cancel`, `submit` | live; sandbox accounts start at 0.00 GBP |
+| `GET /accounts`, `POST /accounts`, transactions | live |
+| `POST /payments`, `validate`, list, `PATCH`, `cancel`, `submit` | live; sandbox accounts start at 0.00 USD |
 | `GET /cards`, `POST /cards`, freeze, unfreeze | live |
 | `GET /loans/offers`, accept, `GET /loans` | live |
 | `GET /members`, `POST /members`, `PATCH`, `DELETE`, `GET /invitations` | live |
 | `POST /webhooks` and the rest of the webhook routes | live |
+| `GET /events` | live |
 | Live login | next |
 
 Do not invent endpoints that are not listed as live. If a call returns

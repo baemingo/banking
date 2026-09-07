@@ -5,13 +5,12 @@
 #
 #   scripts/onboard.sh [national_id] [org_number]
 #
-# $BANKING_API_BASE replaces the host (https://banking-api.baemingo.se) when set;
-# /se/v1 is always appended. Defaults: Johan Johansson and Last Call AB.
+# Defaults: Johan Johansson and Last Call AB.
 set -euo pipefail
 
 NATIONAL_ID="${1:-199511092380}"
 ORG="${2:-5578933433}"
-BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se}/se/v1"
+BASE="https://banking-api.baemingo.com/se/v1"
 J=(-H 'Content-Type: application/json')
 
 login=$(curl -sS -X POST "$BASE/login" "${J[@]}" -d "{\"national_id\":\"$NATIONAL_ID\",\"sandbox\":true}")

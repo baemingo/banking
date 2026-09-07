@@ -3,11 +3,9 @@
 # submit both, poll the authorization until approved, print the result.
 #
 #   scripts/pay.sh
-#
-# Uses $BANKING_API_BASE if set, otherwise the production base URL.
 set -euo pipefail
 
-BASE="${BANKING_API_BASE:-https://banking-api.baemingo.se}/se/v1"
+BASE="https://banking-api.baemingo.com/se/v1"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 KEY=$("$HERE/login.sh" 199511062391 2>/dev/null)

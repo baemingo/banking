@@ -1,7 +1,7 @@
 # API reference, United Kingdom
 
-Base URL `https://banking-api.baemingo.se/uk/v1`, or `$BANKING_API_BASE/uk/v1`
-if the variable is set. Error codes: `../../references/errors.md`.
+Base URL `https://banking-api.baemingo.com/uk/v1`. Error codes:
+`../../references/errors.md`.
 Login, poll, cancel, connect, `GET /company` and `GET /events` have the same
 shapes as in Sweden; see `../sweden/api.md`. The differences are below.
 
@@ -23,12 +23,14 @@ Start onboarding a new company. No auth (the complete login is the proof).
   "name": "Sandbox Bakery Ltd",
   "registration_number": "12345678",
   "legal_form": "private_limited",
+  "vat_absence_reason": "below_tax_threshold",
   "address": { "street": "1 Bread Street", "city": "London", "postal_code": "EC4M 9BT" }
 }
 ```
 
 `legal_form`: `private_limited` (default), `public_limited`, `partnership`,
-`sole_trader`.
+`sole_trader`. Give `vat_number` (`GB` plus nine digits) or
+`vat_absence_reason` (`industry_exempt`, `below_tax_threshold`).
 
 Response `201`:
 
@@ -78,15 +80,34 @@ Body per the requirement's `schema`. For `decision_makers`:
 {
   "people": [
     { "first_name": "Ada", "last_name": "Lovelace", "date_of_birth": "1985-12-10",
-      "email": "ada@example.com", "roles": ["director", "owner"],
+      "job_title": "CEO", "phone": "+447700900123", "email": "ada@example.com",
+      "roles": ["director", "signatory", "owner", "controller"],
       "address": { "street": "2 Analytical Row", "city": "London", "postal_code": "N1 9GU", "country": "GB" } }
   ]
 }
 ```
 
-Roles: `director`, `signatory`, `owner` (25% or more). Returns the refreshed
-application. Submitting a `human_step` requirement or a blocked one returns
-`invalid_state`.
+Roles: `director`, `signatory` (signs for the company, accepts the terms),
+`owner` (25% or more), `controller` (runs the company). At least one
+signatory and one controller are required. Submitting replaces the list.
+
+For `business_line`:
+
+```json
+{ "industry_code": "339E", "website": "https://example.com",
+  "source_of_funds": "Sales of bread and pastries to consumers" }
+```
+
+For `terms_of_service`, first fetch each PDF in `prefill.documents[].href`
+(`GET /applications/{id}/terms/{type}`, returns `application/pdf`) for the
+signatory to read, then:
+
+```json
+{ "accepted_by": "<id from prefill.signatories>", "accepted": true }
+```
+
+Every submit returns the refreshed application. Submitting a `human_step`
+requirement or a blocked one returns `invalid_state`.
 
 ## Accounts, transactions, payments
 
@@ -100,10 +121,11 @@ Same shapes and routes as Sweden (`../sweden/api.md`): `GET /accounts`,
   Currency is GBP. `execute_on` must be omitted; scheduling is not supported.
 - Submit returns an Authorization already `approved` with `human_step: null`,
   because the key holder is the approver. There is no BankID.
-- Today `GET /accounts` returns an empty list and any submit is `rejected`
-  with a reason naming the missing bank permissions. Drafting and validation
-  work. This changes the moment the provider credential gets its roles.
+- `POST /accounts` `{ "name": "Tax reserve" }` opens another GBP account
+  (full role). Response `201`, same shape as an item in `GET /accounts`.
+- Sandbox accounts start at 0.00 GBP, so a transfer from an unfunded
+  account comes back as an Authorization that is `rejected` with a `reason`.
 
 ## Not yet live
 
-Live login, scheduled payments, members, invitations and webhooks.
+Live login and scheduled payments.

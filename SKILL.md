@@ -1,31 +1,31 @@
 ---
 name: baemingo-banking
-description: Build a bank or banking features on the Baemingo Banking API. Headless business banking for agents in Sweden (BankID, Bankgiro, Plusgiro), the United Kingdom (email login, Faster Payments), Germany and Italy (SEPA). Use when a user wants to build their own bank, a finance dashboard, onboard a company, read company accounts, balances and transactions, or make and approve payments. Sandbox first, no secrets in prompts, one country at a time.
+description: Lets an agent build a bank. The Baemingo Banking API is a full business bank account behind one HTTP API: the agent onboards a company and opens its account on its own, then holds and moves the company's money. There is no fixed banking app on top: the user gets whatever front end suits them, a dashboard, a bookkeeping view, a payout tool or a mobile app, built in an afternoon. Everything works first in a sandbox with test companies, and the same calls go live when the user is ready. Funds sit with regulated partner banks, named per country. Use when the user wants to build a bank or fintech product, give a company a business bank account, run treasury, bookkeeping or payouts from code, or pay invoices and suppliers. Covers Sweden, the United Kingdom, the United States, Germany and Italy.
 ---
 
 # Baemingo Banking
 
-Headless business banking for agents. You get a company's accounts,
-balances, transactions and payments through one HTTP API at
-`https://banking-api.baemingo.se`. A person is needed exactly twice: to log
-in and connect a company, and every time money leaves the company. Both
-arrive as the same `human_step` object. Everything else runs on a 90-day
-API key that you keep in your own configuration.
-
-If the environment variable `BANKING_API_BASE` is set, it replaces the host
-`https://banking-api.baemingo.se` (local and staging deployments). Country
-paths such as `/se/v1` are appended to it.
+A business bank account behind one HTTP API at
+`https://banking-api.baemingo.com`. You can onboard a company and open its
+account, read balances and transactions, and send payments. Funds are held
+by a regulated partner bank; each country's folder names it. There is no
+banking app to fit into; build the front end the user actually wants on top
+of these calls. Start in the sandbox with test companies; the same calls
+work live. Whenever a step needs a person, it arrives as a `human_step`
+object with a poll link. Day-to-day calls run on a 90-day API key that you
+keep in your own configuration.
 
 ## The rules
 
 1. **A 90-day key returns everything.** Accounts, balances, transactions,
    payment drafts. Never log in to read data.
-2. **A human step is needed only to send payments**, and in some countries
-   for a few live bank actions. It always arrives as `human_step`. In
-   sandbox it completes on its own; you just poll.
+2. **Anything that needs a person arrives as `human_step`.** Login,
+   identity checks and signatures during onboarding, and payment approval
+   where the country requires it. Show it to the user and poll; in sandbox
+   it completes on its own.
 3. **Start in the sandbox.** Pass `"sandbox": true` on login. Switch to live
-   only when the person asks.
-4. **Never show an API key to the person.** Store it in your configuration
+   only when the user asks.
+4. **Never show an API key to the user.** Store it in your configuration
    with owner-only permissions.
 5. **Follow `next_actions`.** Every response lists what you can do next with
    method, href and body. Do not guess routes. Errors carry `remediation`;
@@ -34,22 +34,24 @@ paths such as `/se/v1` are appended to it.
 ## First: which country?
 
 Each country has its own API path, its own login method and its own payment
-types. Ask the person which country their company is registered in if you do
+types. Ask the user which country their company is registered in if you do
 not already know, then read that country's folder and follow only that.
 
-| Country | Read | Status |
+| Country | Read | Availability |
 |---|---|---|
-| Sweden | `countries/sweden/README.md` | live: login, accounts, transactions, payments |
-| United Kingdom | `countries/uk/README.md` | sandbox: login, company creation, onboarding loop. Accounts and payments wait on bank permissions |
+| Sweden | `countries/sweden/README.md` | live and sandbox |
+| United Kingdom | `countries/uk/README.md` | sandbox |
+| United States | `countries/us/README.md` | sandbox |
 | Germany | `countries/germany/README.md` | not yet available |
 | Italy | `countries/italy/README.md` | not yet available |
 
-Do not mix countries. A Swedish key does not work on the German path and
-vice versa.
+Each README ends with a "What exists today" table; trust it over any
+assumption. Do not mix countries: a key is issued for one country's path and
+does not work on another.
 
 ## Shared conventions
 
-- Money is `{ "amount": "123.45", "currency": "SEK" }`. Decimal strings.
+- Money is `{ "amount": "123.45", "currency": "<ISO 4217>" }`. Decimal strings.
 - Ids are prefixed: `cmp_` company, `lgn_` login, `acct_` account, `txn_`
   transaction, `pay_` payment, `auth_` authorization.
 - Lists paginate with `limit` and `cursor`; follow `next_cursor` until null.

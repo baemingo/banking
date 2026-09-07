@@ -4,7 +4,7 @@ Every error is `application/problem+json`:
 
 ```json
 {
-  "type": "https://banking-api.baemingo.se/errors/key_expired",
+  "type": "https://banking-api.baemingo.com/errors/key_expired",
   "title": "Key expired",
   "status": 403,
   "code": "key_expired",
@@ -34,4 +34,4 @@ call that fixes the problem.
 | `idempotency_mismatch` | 422 | Same `Idempotency-Key`, different body | Use a new key or resend the identical body |
 | `rate_limited` | 429 | Too many requests | Wait `Retry-After` seconds |
 | `internal_error` | 500 | Our fault | Retry once, then report `request_id` |
-| `provider_unavailable` | 503 | The bank did not answer | Retry with backoff; stored data is unaffected |
+| `provider_unavailable` | 503 | The banking partner did not answer | Retry with backoff; stored data is unaffected |
