@@ -10,10 +10,11 @@ examples is in `api.md`. Error codes are in `../../references/errors.md`.
 ## Logging in
 
 1. `POST /login` with `{ "national_id": "<12 digits>", "sandbox": true }`.
-   Sandbox uses the test environment, a personal number from `sandbox.md`,
-   and BankID that completes on its own. Omit `sandbox` or pass `false` for
-   live with a real person. Response is `202` with a `human_step` (type
-   `bankid`) and `human_step.poll.href`.
+   In sandbox any twelve-digit personal number works and gets its own
+   private test bank with a company, accounts and history (see
+   `sandbox.md`); BankID completes on its own. Omit `sandbox` or pass
+   `false` for live with a real person. Response is `202` with a
+   `human_step` (type `bankid`) and `human_step.poll.href`.
 2. `GET` the poll href every `poll.after_ms` milliseconds until `status` is
    `complete`. In live, show `human_step.qr` as an image or `human_step.url`
    as a link and let the user approve in their BankID app.
@@ -24,12 +25,14 @@ examples is in `api.md`. Error codes are in `../../references/errors.md`.
 
 ## Opening a company's account (onboarding)
 
-Most users start here: they have no company on the platform yet.
+Live users start here: they have no company on the platform yet. In
+sandbox every login already has one active company, and you can still
+onboard more.
 
 1. From the complete login, `POST` the `create_company` action with
    `{ "registration_number": "5578933433" }` (10 digits, or 12 with the 16
-   prefix). The company appears with status `onboarding` and an
-   `application`.
+   prefix; any ten digits in sandbox). The company appears with status
+   `onboarding` and an `application`.
 2. Connect it for a key (below). `GET /company` gives `application`;
    `GET /applications/{id}` returns `requirements[]`.
 3. Loop: take the first `pending` requirement of kind `form`, ask the user
@@ -44,10 +47,14 @@ Most users start here: they have no company on the platform yet.
    Authorization, then retry. In sandbox that completes on its own too.
 
 Requirement keys you will meet: `applicant_contact`, `credit_check`,
-`beneficial_owners`, `kyc_questions`, `aml_questions`, `package`,
-`debit_card` (pick `display_name` from `prefill.allowed_display_names`),
-`bankgiro`, `data_sharing_consent` (answer `yes`), `agreement_setup`,
-`agreement_signature`. The set depends on the package chosen.
+`beneficial_owners`, `kyc_questions`, `aml_questions`, `industry_codes`,
+`package`, `debit_card` (pick `display_name` from
+`prefill.allowed_display_names`), `bankgiro`, `data_sharing_consent`
+(answer `yes`), `signatories`, `agreement_setup`, `agreement_signature` and
+last `finalize`, which is blocked until everything else is complete and
+opens the account when submitted with `{ "confirm": true }`. The set depends
+on the package chosen. Confirm `finalize` with the user in live: it is
+irreversible.
 
 `DELETE /applications/{id}` cancels a broken or abandoned application; log
 in and create the company again for a fresh one.
@@ -108,9 +115,9 @@ then the webhook is paused and a `webhook.paused` event is written.
 level; it refreshes while a bank session is alive. `POST /members` with
 `{ "national_id": "<12 digits>", "access_level"?, "accounts"? }` adds a
 person. Adding needs a BankID signature, so the response is an Authorization
-to poll, and it is refused when the caller is not a legal representative of
-the company; the refusal comes back as `provider_rejected` with the reason.
-Changing or removing members is not available yet.
+to poll. In live it is refused when the caller is not a legal representative
+of the company; the refusal comes back as `provider_rejected` with the
+reason. Changing or removing members is not available yet.
 
 ## What exists today
 

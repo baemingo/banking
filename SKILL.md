@@ -24,8 +24,9 @@ keep in your own configuration.
    identity checks and signatures during onboarding, and payment approval
    where the country requires it. Show it to the user and poll; in sandbox
    it completes on its own.
-3. **Start in the sandbox.** Pass `"sandbox": true` on login. Switch to live
-   only when the user asks.
+3. **Start in the sandbox.** Pass `"sandbox": true` on login. Nothing in
+   sandbox moves real money or reaches a real bank, so test freely. Switch
+   to live only when the user asks.
 4. **Never show an API key to the user.** Store it in your configuration
    with owner-only permissions.
 5. **Follow `next_actions`.** Every response lists what you can do next with

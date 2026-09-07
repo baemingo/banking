@@ -30,8 +30,9 @@ Request:
 { "national_id": "199511062391", "sandbox": true }
 ```
 
-`sandbox` defaults to `false`. `true` selects the test bank, where BankID
-completes on its own and the key will be `sk_test_`.
+`sandbox` defaults to `false`. `true` selects the test bank, where any
+twelve-digit personal number works, BankID completes on its own and the key
+will be `sk_test_`.
 
 Response `202`:
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# Sweden sandbox: log in as a person with no company, create one, connect,
-# then drive the onboarding requirements loop with plausible answers until
-# only human steps remain. Never finalizes. Prints the key last.
+# Sweden sandbox: log in, create a company for an organisation number, connect,
+# then drive the onboarding requirements loop with plausible answers through
+# the BankID signature and the final "open the account" step. Prints the key
+# last; GET /accounts with it shows the new company's account.
 #
 #   scripts/onboard.sh [national_id] [org_number]
 #
-# Defaults: Johan Johansson and Last Call AB.
+# Any twelve-digit personal number and any ten-digit organisation number work
+# in sandbox. Defaults: Johan Johansson and 5578933433.
 set -euo pipefail
 
 NATIONAL_ID="${1:-199511092380}"
 ORG="${2:-5578933433}"
-BASE="https://banking-api.baemingo.com/se/v1"
+BASE="${BASE:-https://banking-api.baemingo.com/se/v1}"
 J=(-H 'Content-Type: application/json')
 
 login=$(curl -sS -X POST "$BASE/login" "${J[@]}" -d "{\"national_id\":\"$NATIONAL_ID\",\"sandbox\":true}")
@@ -71,6 +73,7 @@ for round in $(seq 1 40); do
     credit_products) body=$(jq -r .prefill <<<"$req" | jq -c '{products: [.products[] | {product_id: .productId, credit_limit: 10000}]}') ;;
     signatories) body=$(jq -r .prefill <<<"$req" | jq -c '{national_ids: [.signatories[].nationalId]}') ;;
     agreement_setup) body='{}' ;;
+    finalize) body='{"confirm":true}' ;;
     *) echo "no answer for $key_name; skipping" >&2; SKIP="$SKIP,$key_name"; continue ;;
   esac
   result=$(curl -sS -X POST "$href" "${A[@]}" -d "$body")

@@ -1,41 +1,74 @@
 # Sandbox
 
 Sandbox and live are the same API. You choose with `"sandbox": true` on
-`POST /login`. Sandbox uses the test environment and produces `sk_test_`
-keys; live produces `sk_live_` keys after a real BankID approval. The
-personal numbers below only work in sandbox; sending one with
-`sandbox: false` returns a `validation_failed` error that says so.
+`POST /login`. Sandbox produces `sk_test_` keys; live produces `sk_live_`
+keys after a real BankID approval. No real money moves in sandbox and
+nothing you do there reaches a real bank.
 
-In sandbox the BankID human step completes on its own within a few seconds.
-There is no approve endpoint and nothing to click. Just poll.
+## Any personal number works
 
-| Personal number | Person | Company | What you get |
-|---|---|---|---|
-| `199511092380` | Johan Johansson | none yet | The normal starting point: create a company with organisation number `5578933433` (Last Call AB) and run onboarding |
-| `199511062391` | Victorio Gustafsson | Sunny Days AB | Active company, two accounts, cards, inbox. Best for reading data and paying |
-| `199511072382` | Marie Hassan | Last Straw AB | Active company, two accounts, one card |
+Log in with any twelve-digit personal number, for example `198001011234`.
+The first login creates a private test bank for that number, and the same
+number always comes back to the same one. Nobody else can see it. It holds:
 
-Onboarding in sandbox runs the real flow against the test environment, which
-has one usable test organisation. Its application is shared: if someone has
-already completed it, the API adopts it and you see the finished state
-(status `approved`, every requirement complete) rather than an empty form.
-The requirements loop itself is the same in live. `DELETE /applications/{id}`
-cancels an application; if the test environment refuses, the cancel still
-applies on our side so you can move on. The sandbox never runs the final
-"open the account" step, so an approved sandbox company has no accounts. Do
-not use `199511082399` / On Time AB: its application is corrupt in the test
-environment and every read returns an upstream error.
+- a person with a name derived from the number;
+- one active company with a business account (`Företagskonto`, with a
+  Bankgiro number) and a savings account (`Sparkonto`), each with a
+  positive balance and about three months of history: customer payments in
+  by Bankgiro, supplier payments out, card purchases, Swish, salaries and a
+  monthly fee.
 
-Sandbox data is shared between everyone using these identities. Do not rely
-on balances or transaction counts staying the same.
+Pick a number of your own and stay with it; data persists between runs.
+Numbers nobody has used for 30 days are cleaned up. These three are
+published examples and behave like any other number:
 
-Payments in sandbox go to the test environment and are signed by the
-auto-completing BankID. They reach `sent`. The test environment books most
-of them within seconds and the store is refreshed right after approval, so
-balances and transactions usually move; do not rely on exact timing. Booked
-sandbox payments show up with kind `domestic_out` regardless of type. Use
-`5050-1055` as a valid Bankgiro number and `1234567890128` as a valid OCR
-reference.
+| Personal number | Person | Company |
+|---|---|---|
+| `199511062391` | Victorio Gustafsson | Sunny Days AB |
+| `199511072382` | Marie Hassan | Last Straw AB |
+| `199511092380` | Johan Johansson | Last Call AB |
 
-Names may carry a `Demo` prefix from the test environment; the API strips
-it.
+In sandbox the BankID human step completes on its own within a couple of
+seconds. There is no approve endpoint and nothing to click. Just poll.
+
+## Payments
+
+Payments are signed by the auto-completing BankID and reach `sent`. A
+payment dated today is booked at once; a payment dated in the future waits
+in the bank's upcoming list until that day. An amount the account cannot
+cover fails with reason `insufficientFunds`. The status settles to
+`executed`, `scheduled` or `failed` on your next read of accounts or
+transactions while the bank session from the approval is alive, so read
+once more a minute after approval.
+
+Money paid to another company in the same test bank arrives there: a
+`domestic_account` payment to its clearing and account number, or a
+`bankgiro` payment to its Bankgiro number, credits that account. That is
+how you fund a company you have just onboarded. Payments to anyone else
+leave the account and go nowhere, which is what a test bank should do. Use
+`5050-1055` as a valid external Bankgiro number and `1234567890128` as a
+valid OCR reference.
+
+## Onboarding
+
+Create a company with any ten-digit organisation number, for example
+`5566778899`. The requirements loop is the one the live bank runs: contact
+details, credit check, beneficial owners and their questions, know-your-
+customer and anti-money-laundering questionnaires, industry codes, a package
+choice, then the package's products (Bankgiro, data sharing consent and, for
+the Plus package, a debit card holder whose `display_name` must come from
+`prefill.allowed_display_names`), signatories, agreement setup, the BankID
+signature and finally `finalize`. Submitting `finalize` opens the account:
+the company becomes `active` and `GET /accounts` shows a `Företagskonto`
+with a zero balance and a Bankgiro number. Fund it from your seeded company
+as described above.
+
+`DELETE /applications/{id}` cancels an application. Create the company
+again for a fresh one.
+
+## Members
+
+`POST /members` with any twelve-digit personal number adds that person to
+the company after the signing Authorization approves. The person exists
+only inside your test bank; logging in with their number opens their own
+separate test bank and does not show your company.

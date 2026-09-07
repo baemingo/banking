@@ -4,12 +4,12 @@
 #
 #   scripts/login.sh [national_id]
 #
-# Sandbox by default; set SANDBOX=false for the live bank.
-# Defaults to Victorio Gustafsson (Sunny Days AB).
+# Sandbox by default; set SANDBOX=false for the live bank. Any twelve-digit
+# personal number works in sandbox. Defaults to Victorio Gustafsson.
 set -euo pipefail
 
 NATIONAL_ID="${1:-199511062391}"
-BASE="https://banking-api.baemingo.com/se/v1"
+BASE="${BASE:-https://banking-api.baemingo.com/se/v1}"
 
 login=$(curl -sS -X POST "$BASE/login" -H 'Content-Type: application/json' \
   -d "{\"national_id\":\"$NATIONAL_ID\",\"sandbox\":${SANDBOX:-true}}")
