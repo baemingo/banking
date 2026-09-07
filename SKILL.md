@@ -1,13 +1,14 @@
 ---
 name: baemingo-banking
-description: Lets an agent build a bank. The Baemingo Banking API is a full business bank account behind one HTTP API. The agent onboards a company and opens its account on its own, then holds and moves the company's money. There is no fixed banking app on top, so the user gets whatever front end suits them, a dashboard, a bookkeeping view, a payout tool or a mobile app, built in an afternoon. Everything works first in a sandbox with test companies, and the same calls go live when the user is ready. Funds sit with regulated partner banks, named per country. Use when the user wants to build a bank or fintech product, give a company a business bank account, run treasury, bookkeeping or payouts from code, or pay invoices and suppliers. Covers Sweden, the United Kingdom, the United States, Germany and Italy.
+description: Lets an agent build a bank. The Baemingo Banking API puts a full business bank account behind one HTTP API. When the user asks, the agent can take their company through account opening, read balances and transactions, and send payments. There is no fixed banking app on top, so the user gets whatever front end suits them, a dashboard, a bookkeeping view, a payout tool or a mobile app, built in an afternoon. Everything starts in a sandbox with test companies; nothing real is opened or moved until the user chooses to go live. Funds sit with regulated partner banks, named per country. Use when the user wants to build a bank or fintech product, give a company a business bank account, run treasury, bookkeeping or payouts from code, or pay invoices and suppliers. Covers Sweden, the United Kingdom, the United States, Germany and Italy.
 ---
 
 # Baemingo Banking
 
 A business bank account behind one HTTP API at
-`https://banking-api.baemingo.com`. You can onboard a company and open its
-account, read balances and transactions, and send payments. Funds are held
+`https://banking-api.baemingo.com`. When the user asks, you can take their
+company through account opening, read balances and transactions, and send
+payments. Funds are held
 by a regulated partner bank; each country's folder names it. There is no
 banking app to fit into; build the front end the user actually wants on top
 of these calls. Start in the sandbox with test companies; the same calls
