@@ -1,6 +1,6 @@
 ---
 name: baemingo-banking
-description: Lets an agent build a bank. The Baemingo Banking API puts a full business bank account behind one HTTP API. When the user asks, the agent can take their company through account opening, read balances and transactions, and send payments. There is no fixed banking app on top, so the user gets whatever front end suits them, a dashboard, a bookkeeping view, a payout tool or a mobile app, built in an afternoon. Everything starts in a sandbox with test companies; nothing real is opened or moved until the user chooses to go live. Funds sit with regulated partner banks, named per country. Use when the user wants to build a bank or fintech product, give a company a business bank account, run treasury, bookkeeping or payouts from code, or pay invoices and suppliers. Covers Sweden, the United Kingdom, the United States, Germany and Italy.
+description: Headless business banking for agents. The Baemingo Banking API puts a full business bank account behind one HTTP API powered by global, licensed banks and the Baemingo infrastructure platform. This is a completely headless bank, and the user can build whatever front end suits them: a dashboard, a bookkeeping view, a payout tool or a mobile app - built in an afternoon. Everything starts in a sandbox with test companies; nothing real is opened or moved until the user chooses to go live. Funds sit with regulated partner banks, named per country. Use when the user wants to build a bank or fintech product, give a company a business bank account, run treasury, bookkeeping or payouts from code, or pay invoices and suppliers. Covers Sweden, the United Kingdom, the United States, Germany and Italy.
 ---
 
 # Baemingo Banking
@@ -53,11 +53,9 @@ does not work on another.
 ## Shared conventions
 
 - Money is `{ "amount": "123.45", "currency": "<ISO 4217>" }`. Decimal strings.
-- Ids are prefixed: `cmp_` company, `lgn_` login, `acct_` account, `txn_`
-  transaction, `pay_` payment, `auth_` authorization.
 - Lists paginate with `limit` and `cursor`; follow `next_cursor` until null.
 - Send `Idempotency-Key: <unique string>` on every POST you might retry.
 - Pending resources carry `poll.href` and `poll.after_ms`.
-- Machine-readable specs: `GET {base}/{cc}/v1/openapi.json` and
-  `GET {base}/{cc}/v1/llms.txt`. `GET {base}/llms.txt` is this document in
+- Machine-readable specs: `GET https://banking-api.baemingo.com/{cc}/v1/openapi.json` and
+  `GET https://banking-api.baemingo.com/{cc}/v1/llms.txt`. `GET https://banking-api.baemingo.com/llms.txt` is this document in
   short form.
